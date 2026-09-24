@@ -48,7 +48,7 @@ struct ContentView: View {
             FolderDetailView(folder: folder, store: store)
         } else {
             ContentUnavailableView(
-                "Native RDM",
+                "X Native RDM",
                 systemImage: "cylinder.split.1x2",
                 description: Text("选择目录或 Redis 连接，也可以新建一个")
             )
