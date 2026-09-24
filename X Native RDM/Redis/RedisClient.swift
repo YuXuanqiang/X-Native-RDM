@@ -18,7 +18,7 @@ nonisolated private final class ResumeGate: @unchecked Sendable {
 actor RedisClient {
     var isConnected: Bool { connection != nil }
 
-    private let nwQueue = DispatchQueue(label: "com.yion.NativeRDM.redis.nw")
+    private let nwQueue = DispatchQueue(label: "com.yion.XNativeRDM.redis.nw")
     private var connection: NWConnection?
     private var parser = RESPParser()
     private var waiters: [CheckedContinuation<RESPValue, Error>] = []

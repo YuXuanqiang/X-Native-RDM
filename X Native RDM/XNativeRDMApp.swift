@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct NativeRDMApp: App {
+struct XNativeRDMApp: App {
     @State private var store = ConnectionStore()
 
     var body: some Scene {

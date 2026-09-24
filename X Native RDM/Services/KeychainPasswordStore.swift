@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 nonisolated enum KeychainPasswordStore {
-    private static let service = "com.yion.NativeRDM.redis-password"
+    private static let service = "com.yion.XNativeRDM.redis-password"
 
     static func password(for id: UUID) -> String {
         var query: [String: Any] = baseQuery(for: id)

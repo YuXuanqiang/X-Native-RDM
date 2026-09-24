@@ -24,8 +24,14 @@ nonisolated enum ConnectionProfileStore {
     }
 
     private static var directoryURL: URL {
-        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Native RDM", isDirectory: true)
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let current = support.appendingPathComponent("X Native RDM", isDirectory: true)
+        let legacy = support.appendingPathComponent("Native RDM", isDirectory: true)
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: current.path), fm.fileExists(atPath: legacy.path) {
+            try? fm.moveItem(at: legacy, to: current)
+        }
+        return current
     }
 
     private static var fileURL: URL {

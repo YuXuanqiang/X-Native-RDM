@@ -9,7 +9,7 @@ nonisolated enum RedisCommand {
             arguments.append(utf8(password))
         }
         arguments.append(utf8("SETNAME"))
-        arguments.append(utf8("NativeRDM"))
+        arguments.append(utf8("XNativeRDM"))
         return arguments
     }
 
