@@ -187,6 +187,35 @@ final class ConnectionStore {
         self.folderEditor = nil
     }
 
+    func canMoveToRoot(_ node: ConnectionSidebarNode) -> Bool {
+        if let folder = node.folder {
+            return folder.parentID != nil
+        }
+        if let profile = node.profile {
+            return profile.folderID != nil
+        }
+        return false
+    }
+
+    func moveDestinations(for node: ConnectionSidebarNode) -> [FolderOption] {
+        if let folder = node.folder {
+            return availableParentFolders(excluding: folder.id)
+                .filter { $0.id != folder.parentID }
+        }
+        if let profile = node.profile {
+            return availableParentFolders().filter { $0.id != profile.folderID }
+        }
+        return []
+    }
+
+    func move(_ node: ConnectionSidebarNode, to destinationID: UUID?) {
+        if let profile = node.profile {
+            moveProfile(id: profile.id, to: destinationID)
+        } else if let folder = node.folder {
+            moveFolder(id: folder.id, to: destinationID)
+        }
+    }
+
     func duplicate(_ profile: ConnectionProfile) {
         var copy = profile
         copy.id = UUID()
@@ -304,6 +333,31 @@ final class ConnectionStore {
 
     private func nextProfileSortOrder(in folderID: UUID?) -> Int {
         (profiles.filter { $0.folderID == folderID }.map(\.sortOrder).max() ?? -1) + 1
+    }
+
+    private func moveProfile(id: UUID, to folderID: UUID?) {
+        guard let index = profiles.firstIndex(where: { $0.id == id }) else { return }
+        guard profiles[index].folderID != folderID else { return }
+        if let folderID, !folders.contains(where: { $0.id == folderID }) { return }
+        let sortOrder = nextProfileSortOrder(in: folderID)
+        profiles[index].folderID = folderID
+        profiles[index].sortOrder = sortOrder
+        profiles[index].updatedAt = Date()
+        persist()
+    }
+
+    private func moveFolder(id: UUID, to parentID: UUID?) {
+        guard let index = folders.firstIndex(where: { $0.id == id }) else { return }
+        guard folders[index].parentID != parentID else { return }
+        do {
+            try validateParent(parentID, excluding: id)
+        } catch {
+            return
+        }
+        let sortOrder = nextFolderSortOrder(in: parentID)
+        folders[index].parentID = parentID
+        folders[index].sortOrder = sortOrder
+        persist()
     }
 
     private func deleteProfile(_ profile: ConnectionProfile) {

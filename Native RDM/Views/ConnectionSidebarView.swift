@@ -68,7 +68,7 @@ struct ConnectionSidebarView: View {
     @ViewBuilder
     private func sidebarRow(_ node: ConnectionSidebarNode) -> some View {
         if let folder = node.folder {
-            FolderRowView(folder: folder, childCount: node.children?.count ?? 0)
+            FolderRowView(folder: folder, profileCount: profileCount(in: node))
         } else if let profile = node.profile {
             ConnectionRowView(profile: profile, session: store.session(for: profile.id))
         }
@@ -81,6 +81,8 @@ struct ConnectionSidebarView: View {
             Button("新建子目录") { store.beginCreateFolder(parentID: folder.id) }
             Divider()
             Button("重命名…") { store.beginRenameFolder(folder) }
+            moveMenu(for: node)
+            Divider()
             Button("删除…", role: .destructive) { store.requestDeleteFolder(folder) }
         } else if let profile = node.profile {
             Button("连接") { store.connect(profile) }
@@ -88,15 +90,43 @@ struct ConnectionSidebarView: View {
             Divider()
             Button("编辑…") { store.beginEdit(profile) }
             Button("复制") { store.duplicate(profile) }
+            moveMenu(for: node)
             Divider()
             Button("删除…", role: .destructive) { store.requestDelete(profile) }
+        }
+    }
+
+    private func profileCount(in node: ConnectionSidebarNode) -> Int {
+        (node.children ?? []).reduce(0) { total, child in
+            child.profile != nil ? total + 1 : total + profileCount(in: child)
+        }
+    }
+
+    @ViewBuilder
+    private func moveMenu(for node: ConnectionSidebarNode) -> some View {
+        let destinations = store.moveDestinations(for: node)
+        let showsRoot = store.canMoveToRoot(node)
+        Menu("移动") {
+            if showsRoot {
+                Button("根目录") { store.move(node, to: nil) }
+            }
+            if showsRoot && !destinations.isEmpty {
+                Divider()
+            }
+            ForEach(destinations) { option in
+                Button(option.path) { store.move(node, to: option.id) }
+            }
+            if !showsRoot && destinations.isEmpty {
+                Button("没有可移动的目录") {}
+                    .disabled(true)
+            }
         }
     }
 }
 
 private struct FolderRowView: View {
     let folder: ConnectionFolder
-    let childCount: Int
+    let profileCount: Int
 
     var body: some View {
         HStack(alignment: .center, spacing: 6) {
@@ -108,8 +138,8 @@ private struct FolderRowView: View {
                 .foregroundStyle(.primary)
                 .lineLimit(1)
             Spacer(minLength: 4)
-            if childCount > 0 {
-                Text("\(childCount)")
+            if profileCount > 0 {
+                Text("\(profileCount)")
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(.tertiary)
             }
