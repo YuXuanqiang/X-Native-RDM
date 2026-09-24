@@ -40,7 +40,11 @@ struct ContentView: View {
         if let profile = store.selectedProfile {
             let session = store.session(for: profile.id)
             if session.isConnected {
-                KeyBrowserView(profile: profile, session: session, store: store)
+                if session.activeDatabase != nil {
+                    KeyBrowserView(profile: profile, session: session, store: store)
+                } else {
+                    DatabasePickerView(profile: profile, session: session, store: store)
+                }
             } else {
                 ConnectionDetailView(profile: profile, session: session, store: store)
             }
@@ -59,8 +63,14 @@ struct ContentView: View {
     private var detailColumn: some View {
         if let profile = store.selectedProfile {
             let session = store.session(for: profile.id)
-            if session.isConnected {
+            if session.isConnected, session.activeDatabase != nil {
                 KeyInspectorView(session: session)
+            } else if session.isConnected {
+                ContentUnavailableView(
+                    "选择数据库",
+                    systemImage: "cylinder.split.1x2",
+                    description: Text("在中间栏选择要浏览的 Redis 数据库")
+                )
             } else {
                 ContentUnavailableView(
                     "连接后浏览 Key",

@@ -6,7 +6,7 @@ nonisolated struct ConnectionProfile: Identifiable, Codable, Hashable, Sendable 
     var host: String
     var port: Int
     var username: String
-    var database: Int
+    var database: Int?
     var useTLS: Bool
     var verifyTLSCertificate: Bool
     var connectTimeout: TimeInterval
@@ -35,7 +35,7 @@ nonisolated struct ConnectionProfile: Identifiable, Codable, Hashable, Sendable 
         host: String,
         port: Int,
         username: String,
-        database: Int,
+        database: Int?,
         useTLS: Bool,
         verifyTLSCertificate: Bool,
         connectTimeout: TimeInterval,
@@ -66,7 +66,7 @@ nonisolated struct ConnectionProfile: Identifiable, Codable, Hashable, Sendable 
         try container.encode(host, forKey: .host)
         try container.encode(port, forKey: .port)
         try container.encode(username, forKey: .username)
-        try container.encode(database, forKey: .database)
+        try container.encodeIfPresent(database, forKey: .database)
         try container.encode(useTLS, forKey: .useTLS)
         try container.encode(verifyTLSCertificate, forKey: .verifyTLSCertificate)
         try container.encode(connectTimeout, forKey: .connectTimeout)
@@ -83,7 +83,7 @@ nonisolated struct ConnectionProfile: Identifiable, Codable, Hashable, Sendable 
         host = try container.decode(String.self, forKey: .host)
         port = try container.decode(Int.self, forKey: .port)
         username = try container.decode(String.self, forKey: .username)
-        database = try container.decode(Int.self, forKey: .database)
+        database = try container.decodeIfPresent(Int.self, forKey: .database)
         useTLS = try container.decode(Bool.self, forKey: .useTLS)
         verifyTLSCertificate = try container.decodeIfPresent(Bool.self, forKey: .verifyTLSCertificate) ?? true
         connectTimeout = try container.decode(TimeInterval.self, forKey: .connectTimeout)
@@ -101,7 +101,7 @@ nonisolated struct ConnectionProfile: Identifiable, Codable, Hashable, Sendable 
             host: "127.0.0.1",
             port: 6379,
             username: "",
-            database: 0,
+            database: nil,
             useTLS: false,
             verifyTLSCertificate: true,
             connectTimeout: 5,
@@ -130,7 +130,7 @@ nonisolated struct ConnectionDraft: Equatable {
             port: String(profile.port),
             username: profile.username,
             password: password,
-            database: String(profile.database),
+            database: profile.database.map(String.init) ?? "",
             useTLS: profile.useTLS,
             verifyTLSCertificate: profile.verifyTLSCertificate,
             connectTimeout: String(Int(profile.connectTimeout))
@@ -149,8 +149,15 @@ nonisolated struct ConnectionDraft: Equatable {
             throw ValidationError("端口必须是 1 到 65535 之间的整数")
         }
 
-        guard let database = Int(database.trimmingCharacters(in: .whitespacesAndNewlines)), database >= 0 else {
-            throw ValidationError("数据库索引必须是大于等于 0 的整数")
+        let databaseText = database.trimmingCharacters(in: .whitespacesAndNewlines)
+        let database: Int?
+        if databaseText.isEmpty {
+            database = nil
+        } else {
+            guard let value = Int(databaseText), value >= 0 else {
+                throw ValidationError("数据库索引必须是大于等于 0 的整数，或留空")
+            }
+            database = value
         }
 
         guard let timeout = TimeInterval(connectTimeout.trimmingCharacters(in: .whitespacesAndNewlines)), timeout >= 1, timeout <= 60 else {

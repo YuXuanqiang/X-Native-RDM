@@ -16,6 +16,7 @@ struct KeyBrowserView: View {
             keyList(browser)
             footer(browser)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationTitle("Keys")
         .navigationSplitViewColumnWidth(min: 260, ideal: 320, max: 460)
         .toolbar {
@@ -94,6 +95,22 @@ struct KeyBrowserView: View {
                 Text(profile.displayName)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                if profile.database == nil, let activeDatabase = session.activeDatabase {
+                    Picker("数据库", selection: databaseSelection) {
+                        ForEach(session.databaseOptions) { option in
+                            if let keyCount = option.keyCount {
+                                Text("DB \(option.index)（\(keyCount.formatted())）").tag(Optional(option.index))
+                            } else {
+                                Text("DB \(option.index)").tag(Optional(option.index))
+                            }
+                        }
+                        if session.databaseOptions.isEmpty {
+                            Text("DB \(activeDatabase)").tag(Optional(activeDatabase))
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 120)
+                }
                 Spacer()
                 if browser.isScanning {
                     ProgressView()
@@ -105,33 +122,61 @@ struct KeyBrowserView: View {
             .font(.caption)
         }
         .padding(10)
+        .task(id: session.activeDatabase) {
+            if profile.database == nil, session.databaseOptions.isEmpty {
+                await session.refreshDatabaseOptions()
+            }
+        }
+    }
+
+    private var databaseSelection: Binding<Int?> {
+        Binding(
+            get: { session.activeDatabase },
+            set: { newValue in
+                guard let newValue, newValue != session.activeDatabase else { return }
+                Task { await session.selectDatabase(newValue) }
+            }
+        )
     }
 
     @ViewBuilder
     private func keyList(_ browser: RedisKeyBrowser) -> some View {
-        if !browser.isScanning && browser.roots.isEmpty {
-            ContentUnavailableView(
-                "没有 Key",
-                systemImage: "key",
-                description: Text(browser.errorMessage ?? "当前匹配条件下没有数据")
-            )
-        } else {
-            List(selection: Bindable(browser).selectedNodeID) {
-                OutlineGroup(browser.roots, children: \.children) { node in
-                    KeyNodeRow(node: node)
-                        .tag(node.id)
-                        .contextMenu {
-                            if let key = node.redisKey {
-                                Button("复制 Key") { copyToPasteboard(key) }
-                                Button("删除…", role: .destructive) {
-                                    pendingDeleteKey = key
+        Group {
+            if !browser.isScanning && browser.roots.isEmpty {
+                VStack(spacing: 10) {
+                    Image(systemName: "key")
+                        .font(.system(size: 28, weight: .regular))
+                        .foregroundStyle(.secondary)
+                    Text("没有 Key")
+                        .font(.headline)
+                    Text(browser.errorMessage ?? "当前匹配条件下没有数据")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 36)
+                .padding(.horizontal, 16)
+            } else {
+                List(selection: Bindable(browser).selectedNodeID) {
+                    OutlineGroup(browser.roots, children: \.children) { node in
+                        KeyNodeRow(node: node)
+                            .tag(node.id)
+                            .contextMenu {
+                                if let key = node.redisKey {
+                                    Button("复制 Key") { copyToPasteboard(key) }
+                                    Button("删除…", role: .destructive) {
+                                        pendingDeleteKey = key
+                                    }
                                 }
                             }
-                        }
+                    }
                 }
+                .listStyle(.sidebar)
             }
-            .listStyle(.sidebar)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func footer(_ browser: RedisKeyBrowser) -> some View {
@@ -158,8 +203,10 @@ struct KeyBrowserView: View {
 
     private func summaryText(_ browser: RedisKeyBrowser) -> String {
         var parts: [String] = []
-        if let dbSize = browser.dbSize {
-            parts.append("DB \(profile.database) · \(dbSize.formatted()) keys")
+        if let dbSize = browser.dbSize, let database = session.activeDatabase ?? profile.database {
+            parts.append("DB \(database) · \(dbSize.formatted()) keys")
+        } else if let dbSize = browser.dbSize {
+            parts.append("\(dbSize.formatted()) keys")
         }
         parts.append("已加载 \(browser.scanProgress.formatted())")
         return parts.joined(separator: " · ")

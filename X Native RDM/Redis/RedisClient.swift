@@ -29,7 +29,7 @@ actor RedisClient {
         port: Int,
         username: String,
         password: String,
-        database: Int,
+        database: Int?,
         useTLS: Bool,
         verifyTLSCertificate: Bool,
         timeout: Duration
@@ -115,7 +115,7 @@ actor RedisClient {
         receiving = false
     }
 
-    private func authenticate(username: String, password: String, database: Int, timeout: Duration) async throws -> RedisHandshake {
+    private func authenticate(username: String, password: String, database: Int?, timeout: Duration) async throws -> RedisHandshake {
         do {
             let reply = try await execute(RedisCommand.hello(username: username, password: password), timeout: timeout)
             try await selectIfNeeded(database, timeout: timeout)
@@ -132,8 +132,8 @@ actor RedisClient {
         _ = try await execute(RedisCommand.auth(username: username, password: password), timeout: timeout)
     }
 
-    private func selectIfNeeded(_ database: Int, timeout: Duration) async throws {
-        guard database != 0 else { return }
+    private func selectIfNeeded(_ database: Int?, timeout: Duration) async throws {
+        guard let database else { return }
         _ = try await execute(RedisCommand.select(database), timeout: timeout)
     }
 

@@ -22,7 +22,8 @@ struct ConnectionEditorView: View {
                     }
                     TextField("主机", text: draftBinding(\.host))
                     TextField("端口", text: draftBinding(\.port))
-                    TextField("数据库", text: draftBinding(\.database))
+                    TextField("数据库（可选）", text: draftBinding(\.database))
+                        .help("填写后连接时直接进入该库；留空则连接后手动选择")
                 }
 
                 Section("认证") {

@@ -42,7 +42,7 @@ struct ConnectionDetailView: View {
         Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 8) {
             row("主机", profile.host)
             row("端口", String(profile.port))
-            row("数据库", String(profile.database))
+            row("数据库", profile.database.map(String.init) ?? "连接后选择")
             row("用户名", profile.username.isEmpty ? "—" : profile.username)
             row("TLS", profile.useTLS ? (profile.verifyTLSCertificate ? "开启（校验证书）" : "开启（不校验证书）") : "关闭")
             row("超时", "\(Int(profile.connectTimeout)) 秒")

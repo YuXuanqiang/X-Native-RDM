@@ -25,6 +25,10 @@ nonisolated enum RedisCommand {
         [utf8("SELECT"), utf8(String(database))]
     }
 
+    static func configGet(_ parameter: String) -> [Data] {
+        [utf8("CONFIG"), utf8("GET"), utf8(parameter)]
+    }
+
     static func ping() -> [Data] {
         [utf8("PING")]
     }
