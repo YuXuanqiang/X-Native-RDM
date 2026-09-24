@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* Native RDM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Native RDM.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* X Native RDM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "X Native RDM.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,7 +38,7 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* Native RDM.app */,
+				000000000000000000000120 /* X Native RDM.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -46,9 +46,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* Native RDM */ = {
+		000000000000000100000000 /* X Native RDM */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Native RDM" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "X Native RDM" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -59,9 +59,9 @@
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* Native RDM */,
 			);
-			name = "Native RDM";
-			productName = "Native RDM";
-			productReference = 000000000000000000000120 /* Native RDM.app */;
+			name = "X Native RDM";
+			productName = "X Native RDM";
+			productReference = 000000000000000000000120 /* X Native RDM.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -93,7 +93,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* Native RDM */,
+				000000000000000100000000 /* X Native RDM */,
 			);
 		};
 /* End PBXProject section */
@@ -237,7 +237,7 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Native RDM" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "X Native RDM" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -252,7 +252,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Native RDM";
+				INFOPLIST_KEY_CFBundleDisplayName = "X Native RDM";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -275,7 +275,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "Native RDM" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "X Native RDM" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -290,7 +290,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Native RDM";
+				INFOPLIST_KEY_CFBundleDisplayName = "X Native RDM";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -324,11 +324,11 @@
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Native RDM" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "X Native RDM" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Native RDM" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "Native RDM" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "X Native RDM" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "X Native RDM" */,
 			);
 			defaultConfigurationName = Release;
 		};

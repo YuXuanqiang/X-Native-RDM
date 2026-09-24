@@ -5,7 +5,7 @@ struct NativeRDMApp: App {
     @State private var store = ConnectionStore()
 
     var body: some Scene {
-        WindowGroup("Native RDM") {
+        WindowGroup("X Native RDM") {
             ContentView()
                 .environment(store)
         }
